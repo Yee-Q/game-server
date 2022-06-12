@@ -1,0 +1,31 @@
+server:
+  port: 5001
+spring:
+  application:
+    name: game-server-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: game-server-center
+          uri: lb://game-server-center
+          predicates:
+            - Path=/game/center/**
+          filters:
+            - RewritePath=/game/center/?(?<segment>/?.*), /$\{segment}
+gateway:
+  filter:
+    white-request-uri:
+      - /user/login
+    user-request-rate-count: 3
+    global-request-rate-count: 3000
+    cache-user-max-count: 5000
+    cache-user-timeout: 300000
+game-center-server:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.styeeqan.server.gateway.balance.UserLoadBalancerClientFilter
+
+
+
